@@ -14,7 +14,7 @@ use Terminal::ANSIColor;
 constant $default_colours =
   join ",",
   map { 'bold ' ~ $_ }, 
-  <4 196 172 24 10 66 164 blue green red cyan yellow magenta white>;
+  <196 172 24 10 66 164 blue green red cyan yellow magenta white>;
 
 sub hl_colour(Int $index) {
   state @hl_colours = 
@@ -72,6 +72,6 @@ multi MAIN(Bool :$help!) {
 }
 
 multi MAIN {
-  note "{$*PROGRAM.basename} : nothing to highlight, {@*ARGS.elems} passed in.".indent(2)
+  note "{$*PROGRAM.basename} : nothing to highlight, {@*ARGS.elems} arguments supplied.".indent(2)
 }
 
