@@ -1,0 +1,77 @@
+#!/usr/bin/env perl6
+
+use v6;
+
+# SYNOPSIS
+#   hl - highlight text in output
+
+# Inspired by Aristotle's https://github.com/ap/hl.git
+
+# zef install Terminal::AnsiColor
+use Terminal::ANSIColor;
+
+# Requires a 256 colour capable terminal
+constant $default_colours =
+  join ",",
+  map { 'bold ' ~ $_ }, 
+  <4 196 172 24 10 66 164 blue green red cyan yellow magenta white>;
+
+sub hl_colour(Int $index) {
+  state @hl_colours = 
+      map { color($_) },
+      map { S:g/\;/,/ },
+      split( /\s*\,\s*/, %*ENV<HL_COLOURS> // $default_colours);
+
+  state @colours = lazy gather {
+    take @hl_colours.tail while @hl_colours .= rotate 
+  }
+
+  state @cache;
+  
+  @cache[$index] //= @colours[$index];
+}
+
+sub highlight(Str $pattern, @lines where Array|List) {
+  # NOTE
+  # This is done to attach String $pattern into a Regex object as it appears
+  # interpolating a variable inside s/// does not work as intended.
+  # See https://stackoverflow.com/questions/40883160/how-can-i-interpolate-a-variable-into-a-perl-6-regex#comment68989159_40887583
+  my $re = do { rx/<{$pattern}>/; }
+
+  for (@lines) {
+    my $i = 0;
+    say S:g/<$re>/{ hl_colour($i++) ~ $/ ~ RESET }/;
+  }
+}
+
+sub display_help() {
+  print qq:to/EOF/;
+  {$*PROGRAM.basename} <p6re> [<file>|-]
+
+  highlight lines that match <p6re> in given <file>
+
+    -h     - show USAGE
+    --help - show this message
+  EOF
+}
+
+multi MAIN(Str $pattern) {
+  highlight($pattern, $*IN.lines());
+}
+
+multi MAIN(Str $pattern, Str $file) {
+  my @lines = do given $file.Str {
+    when '-' { $*IN.lines() }
+    default  { $file.IO.lines() }
+  }
+  highlight($pattern, @lines);
+}
+
+multi MAIN(Bool :$help!) {
+  display_help() and exit;
+}
+
+multi MAIN {
+  note "{$*PROGRAM.basename} : nothing to highlight, {@*ARGS.elems} passed in.".indent(2)
+}
+
