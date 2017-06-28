@@ -53,7 +53,7 @@ Sometimes highlighting fields helps us find anomalies
 
 If you need a visual aid while staring at or reading from long blocks of text
 
-    hexdump -n $((64*16)) -v -e '/1 "02x"' -e '/64 "\n"' /dev/urandom |
+    hexdump -n $((64*16)) -v -e '/1 "%02x"' -e '/64 "\n"' /dev/urandom |
       hl '. ** 8'
 
 ![blocks](doc/blocks.png)
