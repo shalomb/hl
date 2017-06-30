@@ -16,6 +16,10 @@ constant $default_colours =
   map { 'bold ' ~ $_ }, 
   <196 172 24 10 66 164 blue green red cyan yellow magenta white>;
 
+# TODO
+# This can be better rewritten as a sequence
+# * https://perl6.party/post/Perl-6-Seqs-Drugs-and-Rock-n-Roll--Part-2
+# * https://docs.perl6.org/syntax/$
 sub hl_colour(Int $index) {
   state @hl_colours = 
       map { color($_) },
